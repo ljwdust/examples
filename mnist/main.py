@@ -5,7 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import datasets, transforms
-
+import time
+import torch.backends.cudnn as cudnn
 
 class Net(nn.Module):
     def __init__(self):
@@ -81,6 +82,7 @@ def main():
                         help='For Saving the current Model')
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
+    # cudnn.benchmark = True
 
     torch.manual_seed(args.seed)
 
@@ -106,7 +108,10 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
     for epoch in range(1, args.epochs + 1):
+        timeStart = time.time()
         train(args, model, device, train_loader, optimizer, epoch)
+        timespend = time.time() - timeStart
+        print('Time use: {}'.format(timespend))
         test(args, model, device, test_loader)
 
     if (args.save_model):
